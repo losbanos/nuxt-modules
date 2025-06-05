@@ -6,3 +6,9 @@
 
 <script setup>
 </script>
+
+<style>
+div {
+  font-family: 'Roboto', sans-serif;
+}
+</style>
