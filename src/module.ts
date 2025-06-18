@@ -1,26 +1,37 @@
-import {defineNuxtModule, addPlugin, createResolver} from '@nuxt/kit';
-import type {Nuxt} from 'nuxt/schema';
+import {defineNuxtModule} from '@nuxt/kit';
+import type {Nuxt, NuxtOptions} from 'nuxt/schema';
 
 // Module options TypeScript interface definition
-export interface ModuleOptions {}
+export interface ModuleOptions {
+  dropConsole: boolean;
+  nitroCompressPublicAssets: boolean;
+  nitroMinify: boolean;
+  disableUseAsyncDataDeep: boolean;
+}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: 't-optimizer',
-    configKey: 'tOptimizer'
+    name: 'nuxt-basic-optimizer',
+    configKey: 'basicOptimizer'
   },
   // Default configuration options of the Nuxt module
-  defaults: {},
+  defaults: {
+    dropConsole: true,
+    nitroCompressPublicAssets: true,
+    nitroMinify: true,
+    disableUseAsyncDataDeep: false
+  },
   setup(options: ModuleOptions, nuxt: Nuxt) {
-    const resolver = createResolver(import.meta.url);
+    const nuxtOptions: NuxtOptions = nuxt.options;
 
-    // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
-    addPlugin(resolver.resolve('./runtime/plugin'));
-    const links = [
-      {rel: 'preconnect', href: 'https://fonts.googleapis.com'},
-      {rel: 'preconnect', href: 'https://fonts.gstatic.com'},
-      {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap'}
-    ];
-    nuxt.options.app.head.link?.push(...links);
+    if (options.dropConsole) {
+      nuxtOptions.vite.esbuild ||= {};
+      nuxtOptions.vite.esbuild.pure ||= [];
+      nuxtOptions.vite.esbuild.pure.push('console.log');
+    }
+
+    nuxtOptions.nitro.compressPublicAssets = options.nitroCompressPublicAssets;
+    nuxtOptions.nitro.minify = options.nitroMinify;
+    nuxtOptions.experimental.defaults.useAsyncData.deep = options.disableUseAsyncDataDeep;
   }
 });
