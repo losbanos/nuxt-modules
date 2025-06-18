@@ -10,7 +10,7 @@ export default createConfigForNuxt({
     stylistic: true,
   },
   dirs: {
-    src: ["./playground"],
+    src: ["./playground", "./src"],
   },
 }).append(
   // your custom flat config here...
@@ -20,6 +20,26 @@ export default createConfigForNuxt({
       "@stylistic/comma-dangle": ["error", "never"],
       "@stylistic/quotes": ["error", "single"],
       "@stylistic/object-curly-spacing": ["error", "never"],
+      "@stylistic/member-delimiter-style": [
+        "error",
+        {
+          multiline: {
+            delimiter: "semi",
+            requireLast: true,
+          },
+          singleline: {
+            delimiter: "semi",
+            requireLast: true,
+          },
+        },
+      ],
+      "import/quotes": [
+        "error",
+        "single",
+        {
+          avoidEscape: true,
+        },
+      ],
     },
   }
 );
