@@ -4,5 +4,14 @@ export default defineNuxtConfig({
     autoImport: false
   },
   devtools: {enabled: true},
-  basicOptimizer: {}
+  runtimeConfig: {
+    public: {
+      basicOptimizer: {
+        dropConsole: true,
+        nitroCompressPublicAssets: true,
+        nitroMinify: true,
+        disableUseAsyncDataDeep: true
+      }
+    }
+  }
 });

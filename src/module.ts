@@ -1,5 +1,6 @@
 import {defineNuxtModule} from '@nuxt/kit';
 import type {Nuxt, NuxtOptions} from 'nuxt/schema';
+import {defu} from 'defu';
 
 // Module options TypeScript interface definition
 export interface ModuleOptions {
@@ -24,14 +25,22 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options: ModuleOptions, nuxt: Nuxt) {
     const nuxtOptions: NuxtOptions = nuxt.options;
 
-    if (options.dropConsole) {
+    const moduleOptions = defu(
+      nuxtOptions.runtimeConfig.public.basicOptimizer || {}, {
+      ...options
+    });
+
+    nuxtOptions.runtimeConfig.public.basicOptimizer = moduleOptions;
+
+    console.log('Module options = ', moduleOptions);
+    if (moduleOptions.dropConsole) {
       nuxtOptions.vite.esbuild ||= {};
       nuxtOptions.vite.esbuild.pure ||= [];
       nuxtOptions.vite.esbuild.pure.push('console.log');
     }
 
-    nuxtOptions.nitro.compressPublicAssets = options.nitroCompressPublicAssets;
-    nuxtOptions.nitro.minify = options.nitroMinify;
-    nuxtOptions.experimental.defaults.useAsyncData.deep = options.disableUseAsyncDataDeep;
+    nuxtOptions.nitro.compressPublicAssets = moduleOptions.nitroCompressPublicAssets;
+    nuxtOptions.nitro.minify = moduleOptions.nitroMinify;
+    nuxtOptions.experimental.defaults.useAsyncData.deep = moduleOptions.disableUseAsyncDataDeep;
   }
 });
