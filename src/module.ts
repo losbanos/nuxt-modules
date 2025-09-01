@@ -24,23 +24,26 @@ export default defineNuxtModule<ModuleOptions>({
   },
   setup(options: ModuleOptions, nuxt: Nuxt) {
     const nuxtOptions: NuxtOptions = nuxt.options;
-
+    
     const moduleOptions = defu(
-      nuxtOptions.runtimeConfig.public.basicOptimizer || {}, {
-      ...options
+        nuxtOptions.runtimeConfig.public.basicOptimizer || {}, {
+          ...options
+        });
+        
+    nuxtOptions.runtimeConfig.public.basicOptimizer = moduleOptions;
+    
+    if (moduleOptions.dropConsole) {
+      nuxt.hook('vite:extendConfig', (viteConfig, env) => {
+        viteConfig.esbuild ||= {};
+        viteConfig.esbuild.pure ||= [];
+        viteConfig.esbuild.pure.push('console.log');
+      });
+    }
+    nuxt.hook('nitro:config', (nitroConfig) => {
+      nitroConfig.compressPublicAssets = moduleOptions.nitroCompressPublicAssets;
+      nitroConfig.minify = moduleOptions.nitroMinify;
     });
 
-    nuxtOptions.runtimeConfig.public.basicOptimizer = moduleOptions;
-
-    console.log('Module options = ', moduleOptions);
-    if (moduleOptions.dropConsole) {
-      nuxtOptions.vite.esbuild ||= {};
-      nuxtOptions.vite.esbuild.pure ||= [];
-      nuxtOptions.vite.esbuild.pure.push('console.log');
-    }
-
-    nuxtOptions.nitro.compressPublicAssets = moduleOptions.nitroCompressPublicAssets;
-    nuxtOptions.nitro.minify = moduleOptions.nitroMinify;
     nuxtOptions.experimental.defaults.useAsyncData.deep = moduleOptions.disableUseAsyncDataDeep;
   }
 });
