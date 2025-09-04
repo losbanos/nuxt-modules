@@ -10,6 +10,9 @@ export interface ModuleOptions {
   nitroCompressPublicAssets: boolean;
   nitroMinify: boolean;
   disableUseAsyncDataDeep: boolean;
+  manualChunks: {
+    [key: string]: Array<string>;
+  }
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -22,7 +25,8 @@ export default defineNuxtModule<ModuleOptions>({
     dropConsole: true,
     nitroCompressPublicAssets: true,
     nitroMinify: true,
-    disableUseAsyncDataDeep: false
+    disableUseAsyncDataDeep: false,
+    manualChunks: {}
   },
   setup(options: ModuleOptions, nuxt: Nuxt) {
     const nuxtOptions: NuxtOptions = nuxt.options;
@@ -33,13 +37,28 @@ export default defineNuxtModule<ModuleOptions>({
     });
 
     nuxtOptions.runtimeConfig.public.basicOptimizer = moduleOptions;
-    nuxt.hook('vite:extendConfig', (viteConfig: ViteConfig) => {
+    nuxt.hook('vite:extendConfig', (viteConfig: ViteConfig, {isClient}) => {
       if (moduleOptions.dropConsole) {
         viteConfig.esbuild ||= {};
         viteConfig.esbuild.pure ||= [];
         viteConfig.esbuild.pure.push('console.log');
       }
+      
+      const chunks = Object.entries(moduleOptions.manualChunks ?? {}) as [string, Array<string>][];
+      if (!chunks.length || !isClient || process.env.NODE_ENV !== 'production') return;
+
+      // @ts-ignore
+      viteConfig.build.rollupOptions.output.manualChunks = (id: string) => {
+        for(const [chunkName, chunkIds] of chunks) {
+          for (const chunkId of chunkIds) {
+            if (id.includes(chunkId)) {
+              return chunkName;
+            }
+          }
+        }
+      }
     });
+    
     nuxt.hook('nitro:config', (nitroConfig: NitroConfig) => {
       nitroConfig.compressPublicAssets = moduleOptions.nitroCompressPublicAssets;
       nitroConfig.minify = moduleOptions.nitroMinify;
