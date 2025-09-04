@@ -4,14 +4,13 @@ export default defineNuxtConfig({
     autoImport: false
   },
   devtools: {enabled: true},
-  runtimeConfig: {
-    public: {
-      basicOptimizer: {
-        dropConsole: true,
-        nitroCompressPublicAssets: true,
-        nitroMinify: true,
-        disableUseAsyncDataDeep: true
-      }
+  basicOptimizer: {
+    dropConsole: true,
+    nitroCompressPublicAssets: true,
+    nitroMinify: true,
+    disableUseAsyncDataDeep: true,
+    manualChunks: {
+      rootComponent: ['nuxt-error-page.vue', 'app.vue']
     }
   }
 });
