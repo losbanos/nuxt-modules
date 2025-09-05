@@ -1,4 +1,4 @@
-import {defineNuxtModule} from '@nuxt/kit';
+import {defineNuxtModule, createResolver} from '@nuxt/kit';
 import type {Nuxt, NuxtOptions} from 'nuxt/schema';
 import type {NitroConfig} from 'nitropack';
 import {defu} from 'defu';
@@ -12,7 +12,7 @@ export interface ModuleOptions {
   disableUseAsyncDataDeep: boolean;
   manualChunks: {
     [key: string]: Array<string>;
-  }
+  };
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -27,6 +27,18 @@ export default defineNuxtModule<ModuleOptions>({
     nitroMinify: true,
     disableUseAsyncDataDeep: false,
     manualChunks: {}
+    
+  },
+  hooks: {
+    "nitro:config": (nitroConfig: NitroConfig) => {
+      const {resolve} = createResolver(import.meta.url);
+      nitroConfig.publicAssets ||= [];
+      nitroConfig.publicAssets.push({
+        dir: resolve('./runtime/images'),
+        maxAge: 60 * 60 * 24 * 365
+      });
+      console.log(resolve('./runtime/images'));
+    }
   },
   setup(options: ModuleOptions, nuxt: Nuxt) {
     const nuxtOptions: NuxtOptions = nuxt.options;
@@ -73,5 +85,26 @@ export default defineNuxtModule<ModuleOptions>({
       nitroConfig.minify = moduleOptions.nitroMinify;
     });
     nuxtOptions.experimental.defaults.useAsyncData.deep = !moduleOptions.disableUseAsyncDataDeep;
+
+    const fontLinks: Array<{rel: string, href: string, crossorigin?: "" | "anonymous" | "use-credentials"}> = [
+      {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com"
+      },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossorigin: "anonymous"
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      }
+    ]
+    fontLinks.forEach(link => {
+      nuxtOptions.app.head.link?.push(link);
+    })
+    const {resolve} = createResolver(import.meta.url);
+    nuxtOptions.css.push(resolve('./runtime/css/roboto.css'));
   }
 });
