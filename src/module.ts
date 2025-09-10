@@ -1,4 +1,4 @@
-import {defineNuxtModule, createResolver} from '@nuxt/kit';
+import {defineNuxtModule, createResolver, addPlugin} from '@nuxt/kit';
 import type {Nuxt, NuxtOptions} from 'nuxt/schema';
 import type {NitroConfig} from 'nitropack';
 import {defu} from 'defu';
@@ -106,5 +106,7 @@ export default defineNuxtModule<ModuleOptions>({
     })
     const {resolve} = createResolver(import.meta.url);
     nuxtOptions.css.push(resolve('./runtime/css/roboto.css'));
+
+    addPlugin({src: resolve('./runtime/plugins/plugin')});
   }
 });
