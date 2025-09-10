@@ -1,0 +1,21 @@
+# AI 코딩 가이드라인
+
+## 패키지 관리
+- npm 대신 pnpm을 사용해야 합니다
+- 모든 패키지 설치 및 스크립트 실행은 pnpm 명령어 사용
+- 예시: `pnpm install`, `pnpm run lint`, `pnpm add package-name`
+
+## TypeScript 타입 선언
+- 배열 타입은 제네릭 문법 사용: `Array<T>`
+- Vue 3 Composition API에서 명시적 타입 선언 권장
+- API 호출 시 제네릭 타입 명시: `useFetch<Array<Type>>()`
+
+## 코드 품질
+- ESLint와 Prettier 규칙을 준수 (자동 포맷팅 적용됨)
+- 타입 안전성을 위한 명시적 타입 선언
+- 의미있는 변수명과 함수명 사용
+
+## Vue.js 스타일
+- v-for와 :key는 같은 요소에 배치
+- 템플릿에서 일관된 들여쓰기 사용
+- 컴포넌트 props에 명시적 타입 선언
