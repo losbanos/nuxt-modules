@@ -32,7 +32,7 @@ export default createConfigForNuxt({
             requireLast: true
           }
         }
-      ]
-    }
-  }
+      ],
+      '@stylistic/block-spacing': ['error', 'never']
+    }}
 );
