@@ -2,17 +2,8 @@
 import {ref} from 'vue';
 import type {Ref} from 'vue';
 import {useFetch} from '#app';
+import type {ApiResponse, Product, Aggregations} from './types';
 
-// interface QuoteType {
-//   dateAdded: string;
-//   content: string;
-//   author: string;
-//   _id: string;
-// }
-
-// function refreshQuotes() {
-
-// }
 const url: string = 'https://api.onstove.com/store/v1.0/products/search';
 const params = {
   q: '',
@@ -25,11 +16,12 @@ const params = {
   genre_aggregation_size: 6,
   on_discount: false
 };
+
 const {
   data,
   refresh: _refresh,
   execute: _execute
-} = await useFetch<Array<unknown>>(url, {
+} = await useFetch<ApiResponse>(url, {
   params,
   headers: {
     'x-nation': 'kr',
@@ -39,33 +31,34 @@ const {
     console.error(error);
   }
 });
-const quotes: Ref<Array<unknown>> = ref(data.value || ([] as Array<unknown>));
-console.log('quotes = ', quotes.value);
-// const sortOrder: Ref<string> = ref('desc');
 
-// const toggleSortOrder = () => {
-//   sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc';
-// };
-// const sortedQuotes: Ref<Array<QuoteType>> = computed(() => {
-//   return [...quotes.value].sort((a, b) =>
-//     sortOrder.value === 'desc'
-//       ? new Date(b.dateAdded).getDate() - new Date(a.dateAdded).getDate()
-//       : new Date(a.dateAdded).getDate() - new Date(b.dateAdded).getDate()
-//   );
-// });
+const products: Ref<Array<Product> | null> = ref(
+  data.value?.value?.contents || null
+);
+const aggregations: Ref<Aggregations | null> = ref(
+  data.value?.value?.aggregations || null
+);
+const contents = products.value;
+console.log('API Response:', data.value);
+console.log('Products:', products.value);
+console.log('Aggregations:', aggregations.value);
 </script>
 
 <template>
-  <div class="flex flex-col gap-16 md:gap-20">
-    <div class="inds-category-a-type-item">
+  <div class="flex flex-col gap-16">
+    <div
+      class="inds-category-a-type-item"
+      v-for="content in contents"
+      :key="content.product_no"
+    >
       <div
         class="relative mr-12 w-68 shrink-0 self-start overflow-hidden rounded-lg md:mr-20 md:w-[12.6rem]"
       >
-        <div class="relative w-full pt-[100%]" />
+        <div class="relative w-full pt-[10%]" />
         <img
           loading="lazy"
-          src="https://d2x8kymwjom7h7.cloudfront.net/live/application_no/119001/images/3685_LORDS_IND_0.jpg"
-          alt=""
+          :src="content.title_image_square"
+          :alt="content.product_name"
           class="inds-category-a-type-img"
         />
         <!---->
@@ -73,42 +66,56 @@ console.log('quotes = ', quotes.value);
       <div class="flex h-[inherit] flex-1 items-center">
         <div class="flex-1">
           <!---->
-          <p class="inds-category-a-type-subject">로드 앤 빌레인</p>
+          <p class="inds-category-a-type-subject">{{ content.product_name }}</p>
           <p
             class="mt-4 hidden break-all text-sm leading-md text-on-surface-elevation-3 md:line-clamp-1"
           >
-            이 독특한 봉건 시대의 경제 시뮬레이션을 통해 풍족한 정착지를
+            {{ content.short_piece }}
             꾸리세요. 정착지의 가족들은 물품을 소유하고, 자신의 상점을 운영하며,
             시장에서 다른 주민들과 거래할 것입니다. 당신은 영토를 관리하고, 집을
             짓고, 행사를 조직하고, 세금을 결정하고, 공급과 수요의 균형을 맞추는
             동시에 정치도 벌일 수 있습니다!
           </p>
           <div class="inds-category-a-type-type">
-            <span class="inds-category-a-type-type-item"> 전략 </span>
+            <span
+              class="inds-category-a-type-type-item"
+              v-for="genre in content.genres"
+              :key="genre.tag_no"
+              >{{ genre.tag_name }}</span
+            >
             <span class="inds-category-a-type-type-item"> 시뮬레이션 </span>
           </div>
           <div class="mt-12 hidden items-center md:flex">
             <span
               class="relative inline-flex items-center text-xs font-medium leading-xs text-on-surface-elevation-2 before:mx-8 before:h-[1rem] before:w-[.1rem] before:bg-inverse-elevation-2 first:before:content-none"
             >
-              리뷰 18
+              리뷰 {{ content.review_count }}
             </span>
             <span
               class="relative inline-flex items-center text-xs font-medium leading-xs text-on-surface-elevation-2 before:mx-8 before:h-[1rem] before:w-[.1rem] before:bg-inverse-elevation-2 first:before:content-none"
             >
-              추천 8
+              추천 {{ content.evaluation.recommend_count }}
             </span>
           </div>
         </div>
         <div class="inds-category-a-type-price-group md:ml-40">
-          <i class="inds-category-a-type-sale"> -75% </i>
+          <i class="inds-category-a-type-sale">
+            -{{ content.amount.discount_rate }}%
+          </i>
           <div>
-            <p class="inds-category-a-type-price-original">₩ 27,000</p>
-            <p class="inds-category-a-type-price">₩ 6,750</p>
+            <p class="inds-category-a-type-price-original">
+              ₩ {{ content.amount.original_price }}
+            </p>
+            <p class="inds-category-a-type-price">
+              ₩ {{ content.amount.sales_price }}
+            </p>
           </div>
         </div>
       </div>
-      <a href="/ko/games/3685" class="inds-category-a-type-link" />
+      <a
+        :href="`/ko/games/${content.product_no}`"
+        class="inds-category-a-type-link"
+      />
     </div>
   </div>
 </template>
@@ -127,16 +134,7 @@ console.log('quotes = ', quotes.value);
 :lang(ko) button,
 :lang(ko) input,
 :lang(ko) textarea {
-  font-family:
-    stds-font-kr,
-    'system-ui',
-    -apple-system,
-    BlinkMacSystemFont,
-    Segoe UI,
-    Helvetica,
-    Arial,
-    'sans-serif',
-    Apple Color Emoji,
-    Segoe UI Emoji;
+  font-family: stds-font-kr, 'system-ui', -apple-system, BlinkMacSystemFont,
+    Segoe UI, Helvetica, Arial, 'sans-serif', Apple Color Emoji, Segoe UI Emoji;
 }
 </style>
