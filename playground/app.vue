@@ -19,7 +19,7 @@ const params = {
 
 const {
   data,
-  refresh: _refresh,
+  refresh,
   execute: _execute
 } = await useFetch<ApiResponse>(url, {
   params,
@@ -32,23 +32,29 @@ const {
   }
 });
 
-const products: Ref<Array<Product> | null> = ref(
-  data.value?.value?.contents || null
-);
+const products: Ref<Array<Product>> = ref(data.value?.value?.contents || []);
 const aggregations: Ref<Aggregations | null> = ref(
   data.value?.value?.aggregations || null
 );
-const contents = products.value;
-console.log('API Response:', data.value);
-console.log('Products:', products.value);
-console.log('Aggregations:', aggregations.value);
+
+const handleRefresh = () => {
+  refresh();
+};
+
+const sortByProductNo = () => {
+  products.value.sort((a, b) => a.product_no - b.product_no);
+};
 </script>
 
 <template>
+  <div>
+    <button class="button border-2 border-solid mr-2" @click="handleRefresh">Refresh</button>
+    <button class="button border-2 border-solid" @click="sortByProductNo">Sort by Product No</button>
+  </div>
   <div class="flex flex-col gap-16">
     <div
       class="inds-category-a-type-item"
-      v-for="content in contents"
+      v-for="content in products"
       :key="content.product_no"
     >
       <div
