@@ -14,6 +14,9 @@ importers:
       defu:
         specifier: ^6.1.4
         version: 6.1.4
+      vue3-observe-visibility:
+        specifier: ^1.0.3
+        version: 1.0.3(vue@3.5.21(typescript@5.8.3))
     devDependencies:
       '@nuxt/devtools':
         specifier: ^2.4.1
@@ -3960,6 +3963,11 @@ packages:
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
+
+  vue3-observe-visibility@1.0.3:
+    resolution: {integrity: sha512-dPXJu5NADzui/BwvAE2Vu5/dy+aX0UjRQC6hkLFSY5Da0BxCoPlOE/NkFNz3T+tRXAocey9HBOtaUwZOdWX2KQ==}
+    peerDependencies:
+      vue: ^3.x.x
 
   vue@3.5.21:
     resolution: {integrity: sha512-xxf9rum9KtOdwdRkiApWL+9hZEMWE90FHh8yS1+KJAiWYh+iGWV1FquPjoO9VUHQ+VIhsCXNNyZ5Sf4++RVZBA==}
@@ -8334,6 +8342,10 @@ snapshots:
       '@volar/typescript': 2.4.15
       '@vue/language-core': 2.2.12(typescript@5.8.3)
       typescript: 5.8.3
+
+  vue3-observe-visibility@1.0.3(vue@3.5.21(typescript@5.8.3)):
+    dependencies:
+      vue: 3.5.21(typescript@5.8.3)
 
   vue@3.5.21(typescript@5.8.3):
     dependencies:
