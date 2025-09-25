@@ -105,6 +105,9 @@ export default defineNuxtModule<ModuleOptions>({
     const {resolve} = createResolver(import.meta.url);
     // nuxtOptions.css.push(resolve('./runtime/css/roboto.css'));
 
-    addPlugin({src: resolve('./runtime/plugins/plugin')});
+    addPlugin({
+      src: resolve('./runtime/plugins/observer.ts'),
+      mode: 'client'
+    });
   }
 });

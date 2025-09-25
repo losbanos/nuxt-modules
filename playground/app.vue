@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import type {Ref} from 'vue';
-import {useFetch} from '#app';
 import type {ApiResponse, Product, Aggregations} from './types';
+import {useFetch} from '#app';
 
 const url: string = 'https://api.onstove.com/store/v1.0/products/search';
 const params = {
@@ -41,21 +41,63 @@ const handleRefresh = () => {
   refresh();
 };
 
+// 방법 1: 타입 가드와 런타임 가드를 사용한 안전한 정렬
+const hasValidProductNo = (
+  product: Product
+): product is Product & {product_no: number} => {
+  return (
+    typeof product.product_no === 'number' && !Number.isNaN(product.product_no)
+  );
+};
+
+const _sortByProductNoSafe = () => {
+  const originalLength = products.value.length;
+  const validProducts = products.value.filter(hasValidProductNo);
+
+  validProducts.sort((a, b) => a.product_no - b.product_no);
+  products.value = validProducts;
+
+  if (validProducts.length !== originalLength) {
+    console.warn(
+      `정렬에서 ${
+        originalLength - validProducts.length
+      }개의 유효하지 않은 항목이 제외되었습니다.`
+    );
+  }
+};
+
+// 방법 2: 간단한 런타임 가드 (기본값 사용)
 const sortByProductNo = () => {
-  products.value.sort((a, b) => a.product_no - b.product_no);
+  products.value.sort((a, b) => {
+    // 런타임 가드: product_no가 유효하지 않으면 기본값 0 사용
+    const aProductNo =
+      typeof a.product_no === 'number' && !Number.isNaN(a.product_no)
+        ? a.product_no
+        : 0;
+    const bProductNo =
+      typeof b.product_no === 'number' && !Number.isNaN(b.product_no)
+        ? b.product_no
+        : 0;
+
+    return aProductNo - bProductNo;
+  });
 };
 </script>
 
 <template>
   <div>
-    <button class="button border-2 border-solid mr-2" @click="handleRefresh">Refresh</button>
-    <button class="button border-2 border-solid" @click="sortByProductNo">Sort by Product No</button>
+    <button class="button border-2 border-solid mr-2" @click="handleRefresh">
+      Refresh
+    </button>
+    <button class="button border-2 border-solid" @click="sortByProductNo()">
+      Sort by Product No
+    </button>
   </div>
   <div class="flex flex-col gap-16">
     <div
-      class="inds-category-a-type-item"
       v-for="content in products"
       :key="content.product_no"
+      class="inds-category-a-type-item"
     >
       <div
         class="relative mr-12 w-68 shrink-0 self-start overflow-hidden rounded-lg md:mr-20 md:w-[12.6rem]"
@@ -72,7 +114,9 @@ const sortByProductNo = () => {
       <div class="flex h-[inherit] flex-1 items-center">
         <div class="flex-1">
           <!---->
-          <p class="inds-category-a-type-subject">{{ content.product_name }}</p>
+          <p class="inds-category-a-type-subject">
+            {{ content.product_name }}
+          </p>
           <p
             class="mt-4 hidden break-all text-sm leading-md text-on-surface-elevation-3 md:line-clamp-1"
           >
@@ -84,11 +128,12 @@ const sortByProductNo = () => {
           </p>
           <div class="inds-category-a-type-type">
             <span
-              class="inds-category-a-type-type-item"
               v-for="genre in content.genres"
               :key="genre.tag_no"
-              >{{ genre.tag_name }}</span
+              class="inds-category-a-type-type-item"
             >
+              {{ genre.tag_name }}
+            </span>
             <span class="inds-category-a-type-type-item"> 시뮬레이션 </span>
           </div>
           <div class="mt-12 hidden items-center md:flex">
