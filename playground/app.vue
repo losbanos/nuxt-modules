@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import type {Ref} from 'vue';
-import type {ApiResponse, Product, Aggregations} from './types';
+import type {ApiResponse, Product} from './types';
 import {useFetch} from '#app';
 
 const url: string = 'https://api.onstove.com/store/v1.0/products/search';
+const pageIndex: number = 1;
 const params = {
   q: '',
   currency_code: 'KRW',
-  page: 1,
+  page: pageIndex,
   size: 36,
   direction: 'SCORE',
   'rating.board': 'GRAC',
@@ -20,7 +21,7 @@ const params = {
 const {
   data,
   refresh,
-  execute: _execute
+  execute: execute
 } = await useFetch<ApiResponse>(url, {
   params,
   headers: {
@@ -31,11 +32,20 @@ const {
     console.error(error);
   }
 });
+const products: Ref<Array<Product>> = ref([]);
+const result = ref(data.value?.value?.contents || []);
+products.value.push(...result.value);
 
-const products: Ref<Array<Product>> = ref(data.value?.value?.contents || []);
-const aggregations: Ref<Aggregations | null> = ref(
-  data.value?.value?.aggregations || null
-);
+async function onLoadMore(isVisibility, entry) {
+  if (entry.intersectionRatio > 0) {
+    params.page += 1;
+    await execute();
+    console.log('onload more');
+    // console.log('products = ', products);
+    products.value.push(...result.value);
+  }
+  console.log('entry = ', entry);
+}
 
 const handleRefresh = () => {
   refresh();
@@ -168,6 +178,7 @@ const sortByProductNo = () => {
         class="inds-category-a-type-link"
       />
     </div>
+    <div v-observe-visibility="onLoadMore" class="footer" />
   </div>
 </template>
 
