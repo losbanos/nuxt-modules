@@ -19,9 +19,17 @@ export default createConfigForNuxt({
     '@stylistic/quotes': [
       'error',
       'single',
-      {avoidEscape: true, allowTemplateLiterals: true}
+      {avoidEscape: true, allowTemplateLiterals: 'always'}
     ],
-    'quote-props': ['error', 'as-needed'],
+    '@stylistic/quote-props': [
+      'error',
+      'as-needed',
+      {
+        keywords: false,
+        unnecessary: true,
+        numbers: false
+      }
+    ],
     '@stylistic/object-property-newline': 'off',
     '@stylistic/object-curly-spacing': ['error', 'never'],
     '@stylistic/member-delimiter-style': [

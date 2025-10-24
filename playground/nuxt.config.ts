@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     disableUseAsyncDataDeep: true,
     manualChunks: {
       rootComponent: ['nuxt-error-page.vue', 'app.vue']
-    }
+    },
+    activateObserver: false
   }
 });

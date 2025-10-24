@@ -54,7 +54,7 @@ const handleRefresh = () => {
 // 방법 1: 타입 가드와 런타임 가드를 사용한 안전한 정렬
 const hasValidProductNo = (
   product: Product
-): product is Product & {product_no: number} => {
+): product is Product & {product_no: number;} => {
   return (
     typeof product.product_no === 'number' && !Number.isNaN(product.product_no)
   );
@@ -80,12 +80,12 @@ const _sortByProductNoSafe = () => {
 const sortByProductNo = () => {
   products.value.sort((a, b) => {
     // 런타임 가드: product_no가 유효하지 않으면 기본값 0 사용
-    const aProductNo =
-      typeof a.product_no === 'number' && !Number.isNaN(a.product_no)
+    const aProductNo
+      = typeof a.product_no === 'number' && !Number.isNaN(a.product_no)
         ? a.product_no
         : 0;
-    const bProductNo =
-      typeof b.product_no === 'number' && !Number.isNaN(b.product_no)
+    const bProductNo
+      = typeof b.product_no === 'number' && !Number.isNaN(b.product_no)
         ? b.product_no
         : 0;
 
@@ -96,10 +96,16 @@ const sortByProductNo = () => {
 
 <template>
   <div>
-    <button class="button border-2 border-solid mr-2" @click="handleRefresh">
+    <button
+      class="button border-2 border-solid mr-2"
+      @click="handleRefresh"
+    >
       Refresh
     </button>
-    <button class="button border-2 border-solid" @click="sortByProductNo()">
+    <button
+      class="button border-2 border-solid"
+      @click="sortByProductNo()"
+    >
       Sort by Product No
     </button>
   </div>
@@ -118,7 +124,7 @@ const sortByProductNo = () => {
           :src="content.title_image_square"
           :alt="content.product_name"
           class="inds-category-a-type-img"
-        />
+        >
         <!---->
       </div>
       <div class="flex h-[inherit] flex-1 items-center">
@@ -178,7 +184,10 @@ const sortByProductNo = () => {
         class="inds-category-a-type-link"
       />
     </div>
-    <div v-observe-visibility="onLoadMore" class="footer" />
+    <div
+      v-observe-visibility="onLoadMore"
+      class="footer"
+    />
   </div>
 </template>
 

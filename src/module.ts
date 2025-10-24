@@ -1,4 +1,4 @@
-import {defineNuxtModule, createResolver, addPlugin} from '@nuxt/kit';
+import {defineNuxtModule, createResolver, addPlugin, addPluginTemplate} from '@nuxt/kit';
 import type {Nuxt, NuxtOptions, ViteConfig} from 'nuxt/schema';
 import type {NitroConfig} from 'nitropack';
 import {defu} from 'defu';
@@ -12,6 +12,7 @@ export interface ModuleOptions {
   manualChunks: {
     [key: string]: Array<string>;
   };
+  activateObserver: boolean;
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -25,7 +26,8 @@ export default defineNuxtModule<ModuleOptions>({
     nitroCompressPublicAssets: true,
     nitroMinify: true,
     disableUseAsyncDataDeep: false,
-    manualChunks: {}
+    manualChunks: {},
+    activateObserver: false
   },
   hooks: {
     'nitro:config': (nitroConfig: NitroConfig) => {
@@ -105,9 +107,13 @@ export default defineNuxtModule<ModuleOptions>({
     const {resolve} = createResolver(import.meta.url);
     // nuxtOptions.css.push(resolve('./runtime/css/roboto.css'));
 
-    addPlugin({
-      src: resolve('./runtime/plugins/observer'),
-      mode: 'client'
+    addPluginTemplate({
+      src: resolve('./runtime/plugins/observer.ejs'),
+      mode: 'client',
+      filename: 'observer.mjs',
+      options: {
+        activate: moduleOptions.activateObserver
+      }
     });
     addPlugin({
       src: resolve('./runtime/plugins/observer-stub'),

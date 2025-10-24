@@ -1,0 +1,11 @@
+import {defineNuxtPlugin} from '#imports';
+
+export default defineNuxtPlugin(async (nuxtApp) => {
+  console.log('Nuxt plugin added by module');
+  <% if(options.activate) { %>
+  const Vue3ObserveVisibility = await import('vue3-observe-visibility').then(m => m.default)
+  nuxtApp.vueApp.use(Vue3ObserveVisibility, {})
+  <% } else { %>
+  nuxtApp.vueApp.directive('observe-visibility', {});
+  <% } %>
+});
