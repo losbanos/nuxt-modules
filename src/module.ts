@@ -1,4 +1,9 @@
-import {defineNuxtModule, createResolver, addPlugin, addPluginTemplate} from '@nuxt/kit';
+import {
+  defineNuxtModule,
+  createResolver,
+  addPlugin,
+  addPluginTemplate
+} from '@nuxt/kit';
 import type {Nuxt, NuxtOptions, ViteConfig} from 'nuxt/schema';
 import type {NitroConfig} from 'nitropack';
 import {defu} from 'defu';
@@ -44,9 +49,11 @@ export default defineNuxtModule<ModuleOptions>({
     const nuxtOptions: NuxtOptions = nuxt.options;
 
     const moduleOptions = defu(
-      nuxtOptions.runtimeConfig.public.basicOptimizer || {}, {
+      nuxtOptions.runtimeConfig.public.basicOptimizer || {},
+      {
         ...options
-      });
+      }
+    );
 
     nuxtOptions.runtimeConfig.public.basicOptimizer = moduleOptions;
 
@@ -65,8 +72,12 @@ export default defineNuxtModule<ModuleOptions>({
         viteConfig.esbuild.pure.push('console.log');
       }
 
-      const chunks = Object.entries(moduleOptions.manualChunks ?? {}) as [string, Array<string>][];
-      if (!chunks.length || !isClient || process.env.NODE_ENV !== 'production') return;
+      const chunks = Object.entries(moduleOptions.manualChunks ?? {}) as [
+        string,
+        Array<string>
+      ][];
+      if (!chunks.length || !isClient || process.env.NODE_ENV !== 'production')
+        return;
 
       // @ts-expect-error - viteConfig.build.rollupOptions.output is not typed in vite config
       viteConfig.build.rollupOptions.output.manualChunks = (id: string) => {
@@ -81,12 +92,18 @@ export default defineNuxtModule<ModuleOptions>({
     });
 
     nuxt.hook('nitro:config', (nitroConfig: NitroConfig) => {
-      nitroConfig.compressPublicAssets = moduleOptions.nitroCompressPublicAssets;
+      nitroConfig.compressPublicAssets
+        = moduleOptions.nitroCompressPublicAssets;
       nitroConfig.minify = moduleOptions.nitroMinify;
     });
-    nuxtOptions.experimental.defaults.useAsyncData.deep = !moduleOptions.disableUseAsyncDataDeep;
+    nuxtOptions.experimental.defaults.useAsyncData.deep
+      = !moduleOptions.disableUseAsyncDataDeep;
 
-    const fontLinks: Array<{rel: string; href: string; crossorigin?: '' | 'anonymous' | 'use-credentials';}> = [
+    const fontLinks: Array<{
+      rel: string;
+      href: string;
+      crossorigin?: '' | 'anonymous' | 'use-credentials';
+    }> = [
       {
         rel: 'preconnect',
         href: 'https://fonts.googleapis.com'
@@ -104,16 +121,26 @@ export default defineNuxtModule<ModuleOptions>({
     fontLinks.forEach((link) => {
       nuxtOptions.app.head.link?.push(link);
     });
+    const clientPlugin = moduleOptions.activateObserver
+      ? `import {defineNuxtPlugin} from '#imports';
+      export default defineNuxtPlugin(async (nuxtApp) => {
+        const Vue3ObserveVisibility = await import('vue3-observe-visibility').then(m => m.default)
+        nuxtApp.vueApp.use(Vue3ObserveVisibility, {})`
+      : `import {defineNuxtPlugin} from '#imports';
+      export default defineNuxtPlugin((nuxtApp) => {
+      nuxtApp.vueApp.directive('observe-visibility', {});});`;
+
     const {resolve} = createResolver(import.meta.url);
-    // nuxtOptions.css.push(resolve('./runtime/css/roboto.css'));
 
     addPluginTemplate({
-      src: resolve('./runtime/plugins/observer.ejs'),
+      getContents: () => clientPlugin,
       mode: 'client',
       filename: 'observer.mjs',
       options: {
         activate: moduleOptions.activateObserver
-      }
+      },
+      dst: resolve('./runtime/plugins/observer.ts'),
+      write: true
     });
     addPlugin({
       src: resolve('./runtime/plugins/observer-stub'),
