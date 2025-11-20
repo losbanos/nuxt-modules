@@ -36,7 +36,7 @@ const products: Ref<Array<Product>> = ref([]);
 const result = ref(data.value?.value?.contents || []);
 products.value.push(...result.value);
 
-async function onLoadMore(isVisibility, entry) {
+async function onLoadMore(_isVisibility, entry) {
   if (entry.intersectionRatio > 0) {
     params.page += 1;
     await execute();
@@ -96,6 +96,7 @@ const sortByProductNo = () => {
 
 <template>
   <div>
+    <card-colored />
     <button
       class="button border-2 border-solid mr-2"
       @click="handleRefresh"

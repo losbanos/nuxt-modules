@@ -2,7 +2,9 @@ import {
   defineNuxtModule,
   createResolver,
   addPlugin,
-  addPluginTemplate
+  addPluginTemplate,
+  addComponent,
+  addComponentsDir
 } from '@nuxt/kit';
 import type {Nuxt, NuxtOptions, ViteConfig} from 'nuxt/schema';
 import type {NitroConfig} from 'nitropack';
@@ -146,5 +148,14 @@ export default defineNuxtModule<ModuleOptions>({
       src: resolve('./runtime/plugins/observer-stub'),
       mode: 'server'
     });
+    addComponent({
+      filePath: resolve('runtime/components/CardColored.vue'),
+      name: 'CardColored',
+      export: 'default'
+    });
+    // addComponentsDir({
+    //   path: resolve('runtime/components'),
+    //   prefix: 'Card'
+    // });
   }
 });
