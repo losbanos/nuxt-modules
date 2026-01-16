@@ -4,7 +4,10 @@ import {
   addPlugin,
   addPluginTemplate,
   addComponent,
-  addComponentsDir
+  addImports,
+  addImportsSources,
+  addImportsDir,
+  extendPages
 } from '@nuxt/kit';
 import type {Nuxt, NuxtOptions, ViteConfig} from 'nuxt/schema';
 import type {NitroConfig} from 'nitropack';
@@ -157,5 +160,33 @@ export default defineNuxtModule<ModuleOptions>({
     //   path: resolve('runtime/components'),
     //   prefix: 'Card'
     // });
+
+    // addImports([
+    //   {
+    //     name: 'renderToString',
+    //     as: 'renderToStr',
+    //     from: 'vue/server-renderer'
+    //   },
+    //   {
+    //     name: 'renderToNodeStream',
+    //     as: 'renderToNode',
+    //     from: 'vue/server-renderer'
+    //   }
+    // ]);
+    // addImportsSources({
+    //   from: 'vue/server-renderer',
+    //   imports: ['renderToNodeStream', 'renderToString']
+    // });
+
+    addImportsDir(resolve('./runtime/components'), {
+      prepend: true
+    });
+    extendPages((pages) => {
+      pages.push({
+        name: 'cource-page',
+        file: resolve('./runtime/pages/page-navigation.vue'),
+        path: '/cources/:page'
+      });
+    });
   }
 });
