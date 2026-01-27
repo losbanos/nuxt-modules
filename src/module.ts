@@ -6,6 +6,7 @@ import {
   addComponent,
   addImports,
   addImportsSources,
+  addRouteMiddleware,
   addImportsDir,
   extendPages,
   extendRouteRules
@@ -190,8 +191,13 @@ export default defineNuxtModule<ModuleOptions>({
       });
     });
     extendRouteRules('/course/**', {
-//      redirect: '/test'
+      //      redirect: '/test'
       headers: {'vue-school': 'is Cool?'}
+    });
+    addRouteMiddleware({
+      name: 'redirector',
+      path: resolve('./runtime/redirect.middleware'),
+      global: true
     });
   }
 });
