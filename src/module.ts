@@ -7,7 +7,8 @@ import {
   addImports,
   addImportsSources,
   addImportsDir,
-  extendPages
+  extendPages,
+  extendRouteRules
 } from '@nuxt/kit';
 import type {Nuxt, NuxtOptions, ViteConfig} from 'nuxt/schema';
 import type {NitroConfig} from 'nitropack';
@@ -183,10 +184,14 @@ export default defineNuxtModule<ModuleOptions>({
     });
     extendPages((pages) => {
       pages.push({
-        name: 'cource-page',
+        name: 'course-page',
         file: resolve('./runtime/pages/page-navigation.vue'),
-        path: '/cources/:page'
+        path: '/course/:page'
       });
+    });
+    extendRouteRules('/course/**', {
+//      redirect: '/test'
+      headers: {'vue-school': 'is Cool?'}
     });
   }
 });
