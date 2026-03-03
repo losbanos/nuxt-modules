@@ -9,7 +9,8 @@ import {
   addRouteMiddleware,
   addImportsDir,
   extendPages,
-  extendRouteRules
+  extendRouteRules,
+  addServerPlugin
 } from '@nuxt/kit';
 import type {Nuxt, NuxtOptions, ViteConfig} from 'nuxt/schema';
 import type {NitroConfig} from 'nitropack';
@@ -25,6 +26,7 @@ export interface ModuleOptions {
     [key: string]: Array<string>;
   };
   activateObserver: boolean;
+  compressHtml: boolean;
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -39,7 +41,8 @@ export default defineNuxtModule<ModuleOptions>({
     nitroMinify: true,
     disableUseAsyncDataDeep: false,
     manualChunks: {},
-    activateObserver: false
+    activateObserver: false,
+    compressHtml: false
   },
   hooks: {
     'nitro:config': (nitroConfig: NitroConfig) => {
@@ -199,5 +202,7 @@ export default defineNuxtModule<ModuleOptions>({
       path: resolve('./runtime/redirect.middleware'),
       global: true
     });
+
+    addServerPlugin(resolve('./runtime/plugins/compress'));
   }
 });

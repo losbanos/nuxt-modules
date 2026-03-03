@@ -36,6 +36,7 @@
   "dependencies": {
     "@nuxt/kit": "^3.17.4",
     "defu": "^6.1.4",
+    "h3-compression": "^0.3.2",
     "vue3-observe-visibility": "^1.0.3"
   },
   "devDependencies": {

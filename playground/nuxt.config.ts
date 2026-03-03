@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     manualChunks: {
       rootComponent: ['nuxt-error-page.vue', 'app.vue']
     },
-    activateObserver: false
+    activateObserver: false,
+    compressHtml: true
   }
 });
