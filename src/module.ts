@@ -10,7 +10,8 @@ import {
   addImportsDir,
   extendPages,
   extendRouteRules,
-  addServerPlugin
+  addServerPlugin,
+  extendViteConfig
 } from '@nuxt/kit';
 import type {Nuxt, NuxtOptions, ViteConfig} from 'nuxt/schema';
 import type {NitroConfig} from 'nitropack';
@@ -68,7 +69,12 @@ export default defineNuxtModule<ModuleOptions>({
     nuxtOptions.runtimeConfig.public.basicOptimizer = moduleOptions;
 
     if (moduleOptions.dropConsole) {
-      nuxt.hook('vite:extendConfig', (viteConfig, _env) => {
+      // nuxt.hook('vite:extendConfig', (viteConfig, _env) => {
+      //   viteConfig.esbuild ||= {};
+      //   viteConfig.esbuild.pure ||= [];
+      //   viteConfig.esbuild.pure.push('console.log');
+      // });
+      extendViteConfig((viteConfig) => {
         viteConfig.esbuild ||= {};
         viteConfig.esbuild.pure ||= [];
         viteConfig.esbuild.pure.push('console.log');
@@ -76,11 +82,11 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     nuxt.hook('vite:extendConfig', (viteConfig: ViteConfig, {isClient}) => {
-      if (moduleOptions.dropConsole) {
-        viteConfig.esbuild ||= {};
-        viteConfig.esbuild.pure ||= [];
-        viteConfig.esbuild.pure.push('console.log');
-      }
+      // if (moduleOptions.dropConsole) {
+      //   viteConfig.esbuild ||= {};
+      //   viteConfig.esbuild.pure ||= [];
+      //   viteConfig.esbuild.pure.push('console.log');
+      // }
 
       const chunks = Object.entries(moduleOptions.manualChunks ?? {}) as [
         string,
@@ -135,7 +141,7 @@ export default defineNuxtModule<ModuleOptions>({
       ? `import {defineNuxtPlugin} from '#imports';
       export default defineNuxtPlugin(async (nuxtApp) => {
         const Vue3ObserveVisibility = await import('vue3-observe-visibility').then(m => m.default)
-        nuxtApp.vueApp.use(Vue3ObserveVisibility, {})`
+        nuxtApp.vueApp.use(Vue3ObserveVisibility, {})});`
       : `import {defineNuxtPlugin} from '#imports';
       export default defineNuxtPlugin((nuxtApp) => {
       nuxtApp.vueApp.directive('observe-visibility', {});});`;

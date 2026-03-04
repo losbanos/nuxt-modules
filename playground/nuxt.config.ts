@@ -6,14 +6,14 @@ export default defineNuxtConfig({
   devtools: {enabled: true},
   compatibilityDate: '2025-09-11',
   basicOptimizer: {
-    dropConsole: true,
+    dropConsole: false,
     nitroCompressPublicAssets: true,
     nitroMinify: true,
     disableUseAsyncDataDeep: true,
     manualChunks: {
       rootComponent: ['nuxt-error-page.vue', 'app.vue']
     },
-    activateObserver: false,
+    activateObserver: true,
     compressHtml: true
   }
 });
